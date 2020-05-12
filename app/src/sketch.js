@@ -1,4 +1,5 @@
-import Sketch from 'react-p5';
+import * as ml5 from 'ml5';
+import { rdp } from './rdp';
 
 let sketchRNN;
 let currentStroke;
@@ -19,16 +20,16 @@ let height =
   document.body.clientHeight;
 
 function preload() {
-  sketchRNN = ml5.sketchRNN('catpig');
+  sketchRNN = ml5.sketchRNN('the_mona_lisa');
 }
 
-function startDrawing() {
+const startDrawing = (p5) => {
   personDrawing = true;
-  x = mouseX;
-  y = mouseY;
-}
+  x = p5.mouseX;
+  y = p5.mouseY;
+};
 
-const =  sketchRNNStart = (p5) {
+const sketchRNNStart = (p5) => {
   personDrawing = false;
 
   // Perform RDP Line Simplication
@@ -37,7 +38,7 @@ const =  sketchRNNStart = (p5) {
   const start = seedPoints[0];
   const end = seedPoints[total - 1];
   rdpPoints.push(start);
-  rdp(p5, 0, total - 1, seedPoints, rdpPoints);
+  rdp(0, total - 1, seedPoints, rdpPoints);
   rdpPoints.push(end);
 
   // Drawing simplified path
@@ -66,18 +67,21 @@ const =  sketchRNNStart = (p5) {
   }
 
   sketchRNN.generate(seedPath, gotStrokePath);
-}
+};
 
 export const setup = (p5, parentRef) => {
-  console.log(p5, parentRef);
+  console.log(p5);
+  console.log('PR: ', parentRef);
+  preload();
   let canvas = p5.createCanvas(width, height - 30).parent(parentRef);
-  canvas.touchStarted(startDrawing);
-  canvas.mousePressed(startDrawing);
-  canvas.mouseReleased(sketchRNNStart);
-  canvas.touchEnded(sketchRNNStart);
+  canvas.touchStarted(() => startDrawing(p5));
+  canvas.mousePressed(() => startDrawing(p5));
+  canvas.mouseReleased(() => sketchRNNStart(p5));
+  canvas.touchEnded(() => sketchRNNStart(p5));
   p5.background(200);
   //sketchRNN.generate(gotStrokePath);
   console.log('model loaded');
+  p5 = p5;
 };
 
 function gotStrokePath(error, strokePath) {
@@ -86,26 +90,27 @@ function gotStrokePath(error, strokePath) {
   currentStroke = strokePath;
 }
 
-export function draw(p5) {
-  stroke(0);
-  strokeWeight(4);
+export const draw = (p5) => {
+  console.log(p5);
+  p5.stroke(0);
+  p5.strokeWeight(4);
 
   if (personDrawing) {
-    line(p5.mouseX, p5.mouseY, p5.pmouseX, p5.pmouseY);
-    seedPoints.push(createVector(p5.mouseX, p5.mouseY));
+    p5.line(p5.mouseX, p5.mouseY, p5.pmouseX, p5.pmouseY);
+    seedPoints.push(p5.createVector(p5.mouseX, p5.mouseY));
   }
 
   if (currentStroke) {
     if (nextPen == 'end') {
       sketchRNN.reset();
-      sketchRNNStart();
+      sketchRNNStart(p5);
       currentStroke = null;
       nextPen = 'down';
       return;
     }
 
     if (nextPen == 'down') {
-      line(x, y, x + currentStroke.dx, y + currentStroke.dy);
+      p5.line(x, y, x + currentStroke.dx, y + currentStroke.dy);
     }
     x += currentStroke.dx;
     y += currentStroke.dy;
@@ -113,4 +118,4 @@ export function draw(p5) {
     currentStroke = null;
     sketchRNN.generate(gotStrokePath);
   }
-}
+};
