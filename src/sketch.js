@@ -20,9 +20,11 @@ let height =
   document.documentElement.clientHeight ||
   document.body.clientHeight;
 
-function preload() {
+function preload(type) {
+  console.log(type)
   if(!sketchRNN) {
-    sketchRNN = ml5.sketchRNN('catpig');
+    sketchRNN = ml5.sketchRNN(type || 'catpig');
+    console.log('loaded: ', type || 'catpig')
   }
 }
 
@@ -33,8 +35,6 @@ const startDrawing = (p5) => {
 };
 
 const sketchRNNStart = () => {
-  // console.log(`sketchRNN: ${p5.Vector}`)
-  console.log(`P%: ${p5Instance}`)
   personDrawing = false;
 
   // Perform RDP Line Simplication
@@ -43,10 +43,8 @@ const sketchRNNStart = () => {
   const start = seedPoints[0];
   const end = seedPoints[total - 1];
   rdpPoints.push(start);
-  let a = rdp(0, total - 1, seedPoints, rdpPoints);
-  console.log(`AAAAa ${a}`)
+  rdp(0, total - 1, seedPoints, rdpPoints);
   rdpPoints.push(end);
-  console.log(`RDPPOINTS: ${  rdpPoints}`)
   // Drawing simplified path
   p5Instance.background(255);
   p5Instance.stroke(0);
@@ -62,7 +60,6 @@ const sketchRNNStart = () => {
   y = rdpPoints[rdpPoints.length - 1].y;
 
   seedPath = [];
-  console.log(rdpPoints)
   // Converting to SketchRNN states
   for (let i = 1; i < rdpPoints.length; i++) {
     let strokePath = {
@@ -76,11 +73,9 @@ const sketchRNNStart = () => {
   sketchRNN.generate(seedPath, gotStrokePath);
 };
 
-export const setup = (p5, parentRef) => {
-  console.log(`setup: ${p5}`);
-  console.log('PR: ', parentRef);
+export const setup = (p5, parentRef, type) => {
   p5Instance = p5
-  preload();
+  preload(type);
   let canvas = p5Instance.createCanvas(width, height - 30).parent(parentRef);
   canvas.touchStarted(() => startDrawing(p5Instance));
   canvas.mousePressed(() => startDrawing(p5Instance));
