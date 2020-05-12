@@ -5,8 +5,135 @@ let nextPen = 'down';
 let seedPath = [];
 let personDrawing = false;
 
+let width =
+  window.innerWidth ||
+  document.documentElement.clientWidth ||
+  document.body.clientWidth;
+
+let height =
+  window.innerHeight ||
+  document.documentElement.clientHeight ||
+  document.body.clientHeight;
+
+const availableModels = [
+  'bird',
+  'ant',
+  'ambulance',
+  'angel',
+  'alarm_clock',
+  'antyoga',
+  'backpack',
+  'barn',
+  'basket',
+  'bear',
+  'bee',
+  'beeflower',
+  'bicycle',
+  'book',
+  'brain',
+  'bridge',
+  'bulldozer',
+  'bus',
+  'butterfly',
+  'cactus',
+  'calendar',
+  'castle',
+  'cat',
+  'catbus',
+  'catpig',
+  'chair',
+  'couch',
+  'crab',
+  'crabchair',
+  'crabrabbitfacepig',
+  'cruise_ship',
+  'diving_board',
+  'dog',
+  'dogbunny',
+  'dolphin',
+  'duck',
+  'elephant',
+  'elephantpig',
+  'everything',
+  'eye',
+  'face',
+  'fan',
+  'fire_hydrant',
+  'firetruck',
+  'flamingo',
+  'flower',
+  'floweryoga',
+  'frog',
+  'frogsofa',
+  'garden',
+  'hand',
+  'hedgeberry',
+  'hedgehog',
+  'helicopter',
+  'kangaroo',
+  'key',
+  'lantern',
+  'lighthouse',
+  'lion',
+  'lionsheep',
+  'lobster',
+  'map',
+  'mermaid',
+  'monapassport',
+  'monkey',
+  'mosquito',
+  'octopus',
+  'owl',
+  'paintbrush',
+  'palm_tree',
+  'parrot',
+  'passport',
+  'peas',
+  'penguin',
+  'pig',
+  'pigsheep',
+  'pineapple',
+  'pool',
+  'postcard',
+  'power_outlet',
+  'rabbit',
+  'rabbitturtle',
+  'radio',
+  'radioface',
+  'rain',
+  'rhinoceros',
+  'rifle',
+  'roller_coaster',
+  'sandwich',
+  'scorpion',
+  'sea_turtle',
+  'sheep',
+  'skull',
+  'snail',
+  'snowflake',
+  'speedboat',
+  'spider',
+  'squirrel',
+  'steak',
+  'stove',
+  'strawberry',
+  'swan',
+  'swing_set',
+  'the_mona_lisa',
+  'tiger',
+  'toothbrush',
+  'toothpaste',
+  'tractor',
+  'trombone',
+  'truck',
+  'whale',
+  'windmill',
+  'yoga',
+  'yogabicycle',
+];
+
 function preload() {
-  sketchRNN = ml5.sketchRNN('cat');
+  sketchRNN = ml5.sketchRNN('the_mona_lisa');
 }
 
 function startDrawing() {
@@ -21,12 +148,12 @@ function sketchRNNStart() {
 }
 
 function setup() {
-  let canvas = createCanvas(600, 600);
+  let canvas = createCanvas(width, height);
 
   // detects users mouse actions
   canvas.mousePressed(startDrawing);
   canvas.mouseReleased(sketchRNNStart);
-  background(255);
+  background(200);
   // sketchRNN.generate(gotStrokePath);
   console.log('model loaded');
 }
