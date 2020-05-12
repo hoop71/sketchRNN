@@ -67,10 +67,10 @@ function sketchRNNStart() {
 }
 
 function setup() {
-  let canvas = createCanvas(height, width);
+  let canvas = createCanvas(width, height - 30);
   canvas.mousePressed(startDrawing);
   canvas.mouseReleased(sketchRNNStart);
-  background(255);
+  background(200);
   //sketchRNN.generate(gotStrokePath);
   console.log('model loaded');
 }
