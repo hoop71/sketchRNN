@@ -1,13 +1,14 @@
 let epsilon = 5;
 
-function rdp(startIndex, endIndex, allPoints, rdpPoints) {
+export function rdp(startIndex, endIndex, allPoints, rdpPoints) {
+
   const nextIndex = findFurthest(allPoints, startIndex, endIndex);
   if (nextIndex > 0) {
-    if (startIndex != nextIndex) {
+    if (startIndex !== nextIndex) {
       rdp(startIndex, nextIndex, allPoints, rdpPoints);
     }
     rdpPoints.push(allPoints[nextIndex]);
-    if (endIndex != nextIndex) {
+    if (endIndex !== nextIndex) {
       rdp(nextIndex, endIndex, allPoints, rdpPoints);
     }
   }
@@ -35,14 +36,14 @@ function findFurthest(points, a, b) {
 
 function lineDist(c, a, b) {
   const norm = scalarProjection(c, a, b);
-  return p5.Vector.dist(c, norm);
+  return window.p5.Vector.dist(c, norm);
 }
 
 function scalarProjection(p, a, b) {
-  const ap = p5.Vector.sub(p, a);
-  const ab = p5.Vector.sub(b, a);
+  const ap = window.p5.Vector.sub(p, a);
+  const ab = window.p5.Vector.sub(b, a);
   ab.normalize(); // Normalize the line
   ab.mult(ap.dot(ab));
-  const normalPoint = p5.Vector.add(a, ab);
+  const normalPoint = window.p5.Vector.add(a, ab);
   return normalPoint;
 }
