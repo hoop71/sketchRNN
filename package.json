@@ -1,0 +1,11 @@
+{
+  "name": "draw",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "git@github.com:hoop71/sketchRNN.git",
+  "author": "Matt Hooper <matthew.hooper@ombud.com>",
+  "license": "MIT",
+  "dependencies": {
+    "react-p5": "^1.3.2"
+  }
+}
