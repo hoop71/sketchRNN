@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import Sketch from 'react-p5';
+import Sketch from 'react-p5'; // puts p5 on the window
 
 import { draw, setup } from './sketch';
 

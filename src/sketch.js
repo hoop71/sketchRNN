@@ -1,4 +1,5 @@
-import Sketch from 'react-p5';
+import * as ml5 from 'ml5';
+import { rdp } from './rdp';
 
 let sketchRNN;
 let currentStroke;
@@ -7,6 +8,7 @@ let nextPen = 'down';
 let seedPath = [];
 let seedPoints = [];
 let personDrawing = false;
+let p5Instance;
 
 let width =
   window.innerWidth ||
@@ -19,42 +21,48 @@ let height =
   document.body.clientHeight;
 
 function preload() {
-  sketchRNN = ml5.sketchRNN('catpig');
+  if(!sketchRNN) {
+    sketchRNN = ml5.sketchRNN('catpig');
+  }
 }
 
-function startDrawing() {
+const startDrawing = (p5) => {
   personDrawing = true;
-  x = mouseX;
-  y = mouseY;
-}
+  x = p5.mouseX;
+  y = p5.mouseY;
+};
 
-const =  sketchRNNStart = (p5) {
+const sketchRNNStart = () => {
+  // console.log(`sketchRNN: ${p5.Vector}`)
+  console.log(`P%: ${p5Instance}`)
   personDrawing = false;
 
   // Perform RDP Line Simplication
-  const rdpPoints = [];
+  const rdpPoints = []
   const total = seedPoints.length;
   const start = seedPoints[0];
   const end = seedPoints[total - 1];
   rdpPoints.push(start);
-  rdp(p5, 0, total - 1, seedPoints, rdpPoints);
+  let a = rdp(0, total - 1, seedPoints, rdpPoints);
+  console.log(`AAAAa ${a}`)
   rdpPoints.push(end);
-
+  console.log(`RDPPOINTS: ${  rdpPoints}`)
   // Drawing simplified path
-  p5.background(255);
-  p5.stroke(0);
-  p5.strokeWeight(4);
-  p5.beginShape();
-  p5.noFill();
+  p5Instance.background(255);
+  p5Instance.stroke(0);
+  p5Instance.strokeWeight(4);
+  p5Instance.beginShape();
+  p5Instance.noFill();
   for (let v of rdpPoints) {
-    p5.vertex(v.x, v.y);
+    p5Instance.vertex(v.x, v.y);
   }
-  p5.endShape();
+  p5Instance.endShape();
 
   x = rdpPoints[rdpPoints.length - 1].x;
   y = rdpPoints[rdpPoints.length - 1].y;
 
   seedPath = [];
+  console.log(rdpPoints)
   // Converting to SketchRNN states
   for (let i = 1; i < rdpPoints.length; i++) {
     let strokePath = {
@@ -66,46 +74,46 @@ const =  sketchRNNStart = (p5) {
   }
 
   sketchRNN.generate(seedPath, gotStrokePath);
-}
+};
 
 export const setup = (p5, parentRef) => {
-  console.log(p5, parentRef);
-  let canvas = p5.createCanvas(width, height - 30).parent(parentRef);
-  canvas.touchStarted(startDrawing);
-  canvas.mousePressed(startDrawing);
-  canvas.mouseReleased(sketchRNNStart);
-  canvas.touchEnded(sketchRNNStart);
-  p5.background(200);
-  //sketchRNN.generate(gotStrokePath);
+  console.log(`setup: ${p5}`);
+  console.log('PR: ', parentRef);
+  p5Instance = p5
+  preload();
+  let canvas = p5Instance.createCanvas(width, height - 30).parent(parentRef);
+  canvas.touchStarted(() => startDrawing(p5Instance));
+  canvas.mousePressed(() => startDrawing(p5Instance));
+  canvas.mouseReleased(() => sketchRNNStart(p5Instance));
+  canvas.touchEnded(() => sketchRNNStart(p5Instance));
+  p5Instance.background(200);
   console.log('model loaded');
 };
 
 function gotStrokePath(error, strokePath) {
-  //console.error(error);
-  //console.log(strokePath);
   currentStroke = strokePath;
 }
 
-export function draw(p5) {
-  stroke(0);
-  strokeWeight(4);
+export const draw = (p5) => {
+  p5.stroke(0);
+  p5.strokeWeight(4);
 
   if (personDrawing) {
-    line(p5.mouseX, p5.mouseY, p5.pmouseX, p5.pmouseY);
-    seedPoints.push(createVector(p5.mouseX, p5.mouseY));
+    p5.line(p5.mouseX, p5.mouseY, p5.pmouseX, p5.pmouseY);
+    seedPoints.push(p5.createVector(p5.mouseX, p5.mouseY));
   }
 
   if (currentStroke) {
-    if (nextPen == 'end') {
+    if (nextPen === 'end') {
       sketchRNN.reset();
-      sketchRNNStart();
+      sketchRNNStart(p5);
       currentStroke = null;
       nextPen = 'down';
       return;
     }
 
-    if (nextPen == 'down') {
-      line(x, y, x + currentStroke.dx, y + currentStroke.dy);
+    if (nextPen === 'down') {
+      p5.line(x, y, x + currentStroke.dx, y + currentStroke.dy);
     }
     x += currentStroke.dx;
     y += currentStroke.dy;
@@ -113,4 +121,4 @@ export function draw(p5) {
     currentStroke = null;
     sketchRNN.generate(gotStrokePath);
   }
-}
+};

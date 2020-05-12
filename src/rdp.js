@@ -1,26 +1,27 @@
 let epsilon = 5;
 
-export function rdp(p5, startIndex, endIndex, allPoints, rdpPoints) {
-  const nextIndex = findFurthest(p5, allPoints, startIndex, endIndex);
+export function rdp(startIndex, endIndex, allPoints, rdpPoints) {
+
+  const nextIndex = findFurthest(allPoints, startIndex, endIndex);
   if (nextIndex > 0) {
-    if (startIndex != nextIndex) {
+    if (startIndex !== nextIndex) {
       rdp(startIndex, nextIndex, allPoints, rdpPoints);
     }
     rdpPoints.push(allPoints[nextIndex]);
-    if (endIndex != nextIndex) {
+    if (endIndex !== nextIndex) {
       rdp(nextIndex, endIndex, allPoints, rdpPoints);
     }
   }
 }
 
-function findFurthest(p5, points, a, b) {
+function findFurthest(points, a, b) {
   let recordDistance = -1;
   const start = points[a];
   const end = points[b];
   let furthestIndex = -1;
   for (let i = a + 1; i < b; i++) {
     const currentPoint = points[i];
-    const d = lineDist(p5, currentPoint, start, end);
+    const d = lineDist(currentPoint, start, end);
     if (d > recordDistance) {
       recordDistance = d;
       furthestIndex = i;
@@ -33,16 +34,16 @@ function findFurthest(p5, points, a, b) {
   }
 }
 
-function lineDist(p5, c, a, b) {
-  const norm = scalarProjection(p5, c, a, b);
-  return p5.Vector.dist(c, norm);
+function lineDist(c, a, b) {
+  const norm = scalarProjection(c, a, b);
+  return window.p5.Vector.dist(c, norm);
 }
 
-function scalarProjection(p5, p, a, b) {
-  const ap = p5.Vector.sub(p, a);
-  const ab = p5.Vector.sub(b, a);
+function scalarProjection(p, a, b) {
+  const ap = window.p5.Vector.sub(p, a);
+  const ab = window.p5.Vector.sub(b, a);
   ab.normalize(); // Normalize the line
   ab.mult(ap.dot(ab));
-  const normalPoint = p5.Vector.add(a, ab);
+  const normalPoint = window.p5.Vector.add(a, ab);
   return normalPoint;
 }

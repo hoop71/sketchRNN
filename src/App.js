@@ -1,10 +1,10 @@
 import React from 'react';
-import logo from './logo.svg';
 import './App.css';
 
 import P5 from './p5';
 
 function App() {
+  console.log('loading app')
   return (
     <div className='App'>
       <div
