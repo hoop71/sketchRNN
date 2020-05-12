@@ -3,10 +3,21 @@ let currentStroke;
 let x, y;
 let nextPen = 'down';
 let seedPath = [];
+let seedPoints = [];
 let personDrawing = false;
 
+let width =
+  window.innerWidth ||
+  document.documentElement.clientWidth ||
+  document.body.clientWidth;
+
+let height =
+  window.innerHeight ||
+  document.documentElement.clientHeight ||
+  document.body.clientHeight;
+
 function preload() {
-  sketchRNN = ml5.sketchRNN('cat');
+  sketchRNN = ml5.sketchRNN('catpig');
 }
 
 function startDrawing() {
@@ -17,57 +28,83 @@ function startDrawing() {
 
 function sketchRNNStart() {
   personDrawing = false;
+
+  // Perform RDP Line Simplication
+  const rdpPoints = [];
+  const total = seedPoints.length;
+  const start = seedPoints[0];
+  const end = seedPoints[total - 1];
+  rdpPoints.push(start);
+  rdp(0, total - 1, seedPoints, rdpPoints);
+  rdpPoints.push(end);
+
+  // Drawing simplified path
+  background(255);
+  stroke(0);
+  strokeWeight(4);
+  beginShape();
+  noFill();
+  for (let v of rdpPoints) {
+    vertex(v.x, v.y);
+  }
+  endShape();
+
+  x = rdpPoints[rdpPoints.length - 1].x;
+  y = rdpPoints[rdpPoints.length - 1].y;
+
+  seedPath = [];
+  // Converting to SketchRNN states
+  for (let i = 1; i < rdpPoints.length; i++) {
+    let strokePath = {
+      dx: rdpPoints[i].x - rdpPoints[i - 1].x,
+      dy: rdpPoints[i].y - rdpPoints[i - 1].y,
+      pen: 'down',
+    };
+    seedPath.push(strokePath);
+  }
+
   sketchRNN.generate(seedPath, gotStrokePath);
 }
 
 function setup() {
-  let canvas = createCanvas(600, 600);
-
-  // detects users mouse actions
+  let canvas = createCanvas(height, width);
   canvas.mousePressed(startDrawing);
   canvas.mouseReleased(sketchRNNStart);
   background(255);
-  // sketchRNN.generate(gotStrokePath);
+  //sketchRNN.generate(gotStrokePath);
   console.log('model loaded');
 }
 
-function gotStrokePath(err, strokePath) {
-  // console.log(strokePath);
+function gotStrokePath(error, strokePath) {
+  //console.error(error);
+  //console.log(strokePath);
   currentStroke = strokePath;
 }
 
 function draw() {
   stroke(0);
   strokeWeight(4);
-  if (personDrawing) {
-    let strokePath = {
-      dx: mouseX - pmouseX, // mouse postion - previous
-      dy: mouseY - pmouseY,
-      pen: 'down',
-    };
-    line(x, y, x + strokePath.dx, y + strokePath.dy);
-    x += strokePath.dx;
-    y += strokePath.dy;
 
-    seedPath.push(strokePath);
+  if (personDrawing) {
+    line(mouseX, mouseY, pmouseX, pmouseY);
+    seedPoints.push(createVector(mouseX, mouseY));
   }
 
   if (currentStroke) {
-    console.log('draw machine');
-    if (nextPen === 'end') {
-      noLoop(); // kill sketch and stop
+    if (nextPen == 'end') {
+      sketchRNN.reset();
+      sketchRNNStart();
+      currentStroke = null;
+      nextPen = 'down';
       return;
     }
 
-    if (nextPen === 'down') {
-      console.log('down');
+    if (nextPen == 'down') {
       line(x, y, x + currentStroke.dx, y + currentStroke.dy);
     }
-
-    // currentStroke.pen looks at next dx, dy, where the draw ended
-    nextPen = currentStroke.pen;
     x += currentStroke.dx;
     y += currentStroke.dy;
+    nextPen = currentStroke.pen;
     currentStroke = null;
     sketchRNN.generate(gotStrokePath);
   }
