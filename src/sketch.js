@@ -1,7 +1,6 @@
-import * as ml5 from 'ml5';
 import { rdp } from './rdp';
 
-let sketchRNN;
+import { sketchRNN } from './p5'
 let currentStroke;
 let x, y;
 let nextPen = 'down';
@@ -20,13 +19,6 @@ let height =
   document.documentElement.clientHeight ||
   document.body.clientHeight;
 
-function preload(type) {
-  console.log(type)
-  if(!sketchRNN) {
-    sketchRNN = ml5.sketchRNN(type || 'catpig');
-    console.log('loaded: ', type || 'catpig')
-  }
-}
 
 const startDrawing = (p5) => {
   personDrawing = true;
@@ -75,7 +67,7 @@ const sketchRNNStart = () => {
 
 export const setup = (p5, parentRef, type) => {
   p5Instance = p5
-  preload(type);
+  // preload(type);
   let canvas = p5Instance.createCanvas(width, height - 30).parent(parentRef);
   canvas.touchStarted(() => startDrawing(p5Instance));
   canvas.mousePressed(() => startDrawing(p5Instance));
