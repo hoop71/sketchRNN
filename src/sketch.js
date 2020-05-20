@@ -1,6 +1,6 @@
 import { rdp } from './rdp';
 
-import { sketchRNN } from './p5'
+import { sketchRNN } from './p5';
 let currentStroke;
 let x, y;
 let nextPen = 'down';
@@ -19,7 +19,6 @@ let height =
   document.documentElement.clientHeight ||
   document.body.clientHeight;
 
-
 const startDrawing = (p5) => {
   personDrawing = true;
   x = p5.mouseX;
@@ -30,7 +29,7 @@ const sketchRNNStart = () => {
   personDrawing = false;
 
   // Perform RDP Line Simplication
-  const rdpPoints = []
+  const rdpPoints = [];
   const total = seedPoints.length;
   const start = seedPoints[0];
   const end = seedPoints[total - 1];
@@ -66,15 +65,13 @@ const sketchRNNStart = () => {
 };
 
 export const setup = (p5, parentRef, type) => {
-  p5Instance = p5
-  // preload(type);
+  p5Instance = p5;
   let canvas = p5Instance.createCanvas(width, height - 30).parent(parentRef);
   canvas.touchStarted(() => startDrawing(p5Instance));
   canvas.mousePressed(() => startDrawing(p5Instance));
   canvas.mouseReleased(() => sketchRNNStart(p5Instance));
   canvas.touchEnded(() => sketchRNNStart(p5Instance));
   p5Instance.background(200);
-  console.log('model loaded');
 };
 
 function gotStrokePath(error, strokePath) {
@@ -84,8 +81,10 @@ function gotStrokePath(error, strokePath) {
 export const draw = (p5) => {
   p5.stroke(0);
   p5.strokeWeight(4);
+  console.log('here');
 
   if (personDrawing) {
+    console.log('human drawing');
     p5.line(p5.mouseX, p5.mouseY, p5.pmouseX, p5.pmouseY);
     seedPoints.push(p5.createVector(p5.mouseX, p5.mouseY));
   }
