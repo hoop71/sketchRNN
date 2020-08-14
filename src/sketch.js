@@ -9,9 +9,13 @@ export const startDrawing = (p5Ref) => {
   y = p5Ref.current.mouseY
 }
 
+export const resetSeeds = () => {
+  seedPath = []
+  seedPoints = []
+}
+
 export const sketchRNNStart = ({ p5Ref, ml5Ref, setPersonDrawing, currentStrokeRef }) => {
   if (setPersonDrawing) setPersonDrawing(false)
-  console.log(p5Ref.current)
 
   // Perform RDP Line Simplication
   const rdpPoints = []
@@ -54,7 +58,6 @@ export const sketchRNNStart = ({ p5Ref, ml5Ref, setPersonDrawing, currentStrokeR
 }
 
 const gotStrokePath = ({ currentStrokeRef, strokePath }) => {
-  console.log('strokepaht', strokePath)
   currentStrokeRef.current = strokePath
 }
 

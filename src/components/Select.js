@@ -5,6 +5,9 @@ import React from 'react'
 import { FormControl, FormHelperText, MenuItem, Select as MuiSelect } from '@material-ui/core'
 import { makeStyles } from '@material-ui/core/styles'
 
+// Utils
+import _ from 'lodash'
+
 const useStyles = makeStyles((theme) => ({
   formControl: {
     margin: theme.spacing(1),
@@ -22,7 +25,7 @@ const Select = ({ drawModel, setDrawModel }) => {
       <MuiSelect value={drawModel} onChange={(e) => setDrawModel(e.target.value)} displayEmpty>
         {drawModelOptions.map((option) => (
           <MenuItem key={option} value={option}>
-            <em>{option}</em>
+            <em>{_.startCase(option)}</em>
           </MenuItem>
         ))}
       </MuiSelect>

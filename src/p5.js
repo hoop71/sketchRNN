@@ -10,7 +10,7 @@ import { Select } from 'components'
 import { Button } from '@material-ui/core'
 
 // Utils
-import { draw, sketchRNNStart, startDrawing } from './sketch'
+import { draw, resetSeeds, sketchRNNStart, startDrawing } from './sketch'
 
 // Simple get window height
 let width = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth
@@ -57,10 +57,11 @@ const App = () => {
     startDrawing(p5Ref)
   }
 
-  const handleReset = () => {
+  const handleStop = () => {
     nextPenRef.current = 'down'
     currentStrokeRef.current = null
     setPersonDrawing(false)
+    resetSeeds()
     ml5Ref.current.reset()
   }
 
@@ -80,8 +81,11 @@ const App = () => {
     <div className="App">
       <h1>Draw Me Something Beautiful</h1>
       <Select drawModel={drawModel} setDrawModel={setDrawModel} />
-      <Button onClick={handleReset} color="primary" variant="contained">
-        {personDrawing ? 'Start Drawing' : 'Stop Drawing'}
+      <Button onClick={handleStop} color="primary" variant="contained">
+        Stop Drawing
+      </Button>
+      <Button onClick={() => p5Ref.current.clear()} color="primary" variant="contained">
+        Reset
       </Button>
       {modelLoading ? (
         <h1>loading...</h1>
