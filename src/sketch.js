@@ -8,7 +8,6 @@ let nextPen = 'down'
 let seedPath = []
 let seedPoints = []
 let personDrawing = false
-let p5Instance
 
 let width = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth
 

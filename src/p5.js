@@ -1,12 +1,10 @@
-import React, { Component } from 'react'
+import React from 'react'
 import Sketch from 'react-p5' // puts p5 on the window
 
 import { draw, setup } from './sketch'
 
 const App = () => {
   const p5Ref = React.useRef()
-  let y = 0
-  let direction = '^'
   return (
     <div className="App">
       <h1>Draw Me Something Beautiful</h1>
