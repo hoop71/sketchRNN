@@ -1,21 +1,21 @@
 import { rdp } from './rdp'
 
-let currentStroke
 let x, y
-let nextPen = 'down'
 let seedPath = []
 let seedPoints = []
-let personDrawing = false
 
 export const startDrawing = (p5Ref) => {
-  personDrawing = true
   x = p5Ref.current.mouseX
   y = p5Ref.current.mouseY
 }
 
-export const sketchRNNStart = (p5Ref, ml5Ref) => {
-  console.log(`P%: ${p5Ref}current.`)
-  personDrawing = false
+export const resetSeeds = () => {
+  seedPath = []
+  seedPoints = []
+}
+
+export const sketchRNNStart = ({ p5Ref, ml5Ref, setPersonDrawing, currentStrokeRef }) => {
+  if (setPersonDrawing) setPersonDrawing(false)
 
   // Perform RDP Line Simplication
   const rdpPoints = []
@@ -23,10 +23,10 @@ export const sketchRNNStart = (p5Ref, ml5Ref) => {
   const start = seedPoints[0]
   const end = seedPoints[total - 1]
   rdpPoints.push(start)
-  let a = rdp(0, total - 1, seedPoints, rdpPoints)
-  console.log(`AAAAa ${a}`)
+
+  rdp(0, total - 1, seedPoints, rdpPoints)
   rdpPoints.push(end)
-  console.log(`RDPPOINTS: ${rdpPoints}`)
+
   // Drawing simplified path
   p5Ref.current.background(255)
   p5Ref.current.stroke(0)
@@ -42,7 +42,7 @@ export const sketchRNNStart = (p5Ref, ml5Ref) => {
   y = rdpPoints[rdpPoints.length - 1].y
 
   seedPath = []
-  console.log(rdpPoints)
+
   // Converting to SketchRNN states
   for (let i = 1; i < rdpPoints.length; i++) {
     let strokePath = {
@@ -52,14 +52,23 @@ export const sketchRNNStart = (p5Ref, ml5Ref) => {
     }
     seedPath.push(strokePath)
   }
-  ml5Ref.current.generate(seedPath, gotStrokePath)
+  ml5Ref.current.generate(seedPath, (_, strokePath) =>
+    gotStrokePath({ currentStrokeRef, strokePath })
+  )
 }
 
-function gotStrokePath(error, strokePath) {
-  currentStroke = strokePath
+const gotStrokePath = ({ currentStrokeRef, strokePath }) => {
+  currentStrokeRef.current = strokePath
 }
 
-export const draw = (p5Ref, ml5Ref) => {
+export const draw = ({
+  p5Ref,
+  ml5Ref,
+  personDrawing,
+  setPersonDrawing,
+  nextPenRef,
+  currentStrokeRef
+}) => {
   p5Ref.current.stroke(0)
   p5Ref.current.strokeWeight(4)
 
@@ -73,22 +82,23 @@ export const draw = (p5Ref, ml5Ref) => {
     seedPoints.push(p5Ref.current.createVector(p5Ref.current.mouseX, p5Ref.current.mouseY))
   }
 
-  if (currentStroke) {
-    if (nextPen === 'end') {
+  if (currentStrokeRef.current) {
+    if (nextPenRef.current === 'end') {
+      console.log('nextPenRef', nextPenRef.current)
       ml5Ref.current.reset()
-      sketchRNNStart(p5Ref, ml5Ref)
-      currentStroke = null
-      nextPen = 'down'
+      sketchRNNStart({ p5Ref, ml5Ref, setPersonDrawing, currentStrokeRef })
+      currentStrokeRef.current = null
+      nextPenRef.current = 'down'
       return
     }
 
-    if (nextPen === 'down') {
-      p5Ref.current.line(x, y, x + currentStroke.dx, y + currentStroke.dy)
+    if (nextPenRef.current === 'down') {
+      p5Ref.current.line(x, y, x + currentStrokeRef.current.dx, y + currentStrokeRef.current.dy)
     }
-    x += currentStroke.dx
-    y += currentStroke.dy
-    nextPen = currentStroke.pen
-    currentStroke = null
-    ml5Ref.current.generate(gotStrokePath)
+    x += currentStrokeRef.current.dx
+    y += currentStrokeRef.current.dy
+    nextPenRef.current = currentStrokeRef.current.pen
+    currentStrokeRef.current = null
+    ml5Ref.current.generate((_, strokePath) => gotStrokePath({ currentStrokeRef, strokePath }))
   }
 }
