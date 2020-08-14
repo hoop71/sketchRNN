@@ -52,7 +52,6 @@ export const sketchRNNStart = (p5Ref, ml5Ref) => {
     }
     seedPath.push(strokePath)
   }
-  debugger
   ml5Ref.current.generate(seedPath, gotStrokePath)
 }
 
