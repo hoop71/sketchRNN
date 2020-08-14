@@ -1,18 +1,18 @@
-import React, { Component } from 'react';
-import Sketch from 'react-p5'; // puts p5 on the window
+import React, { Component } from 'react'
+import Sketch from 'react-p5' // puts p5 on the window
 
-import { draw, setup } from './sketch';
+import { draw, setup } from './sketch'
 
-export default class App extends Component {
-  y = 0;
-  direction = '^';
-
-  render() {
-    return (
-      <div className='App'>
-        <h1>Draw Me Something Beautiful</h1>
-        <Sketch setup={setup} draw={(p5) => draw(p5)} />
-      </div>
-    );
-  }
+const App = () => {
+  const p5Ref = React.useRef()
+  let y = 0
+  let direction = '^'
+  return (
+    <div className="App">
+      <h1>Draw Me Something Beautiful</h1>
+      <Sketch setup={(p5, parentRef) => setup(p5, parentRef, p5Ref)} draw={() => draw(p5Ref)} />
+    </div>
+  )
 }
+
+export default App
