@@ -1,34 +1,19 @@
-import * as ml5 from 'ml5'
 import { rdp } from './rdp'
 
-let sketchRNN
 let currentStroke
 let x, y
 let nextPen = 'down'
 let seedPath = []
 let seedPoints = []
 let personDrawing = false
-let p5Instance
 
-let width = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth
-
-let height =
-  window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight
-
-export function preload() {
-  if (!sketchRNN) {
-    sketchRNN = ml5.sketchRNN('catpig')
-  }
-}
-
-const startDrawing = (p5Ref) => {
+export const startDrawing = (p5Ref) => {
   personDrawing = true
   x = p5Ref.current.mouseX
   y = p5Ref.current.mouseY
 }
 
-const sketchRNNStart = (p5Ref) => {
-  // console.log(`sketchRNN: ${p5.Vector}`)
+export const sketchRNNStart = (p5Ref, ml5Ref) => {
   console.log(`P%: ${p5Ref}current.`)
   personDrawing = false
 
@@ -67,28 +52,15 @@ const sketchRNNStart = (p5Ref) => {
     }
     seedPath.push(strokePath)
   }
-
-  sketchRNN.generate(seedPath, gotStrokePath)
-}
-
-export const setup = (p5, parentRef, p5Ref) => {
-  p5Ref.current = p5
-  preload()
-  let canvas = p5Ref.current.createCanvas(width, height - 30).parent(parentRef)
-  canvas.touchStarted(() => startDrawing(p5Ref))
-  canvas.mousePressed(() => startDrawing(p5Ref))
-  canvas.mouseReleased(() => sketchRNNStart(p5Ref))
-  canvas.touchEnded(() => sketchRNNStart(p5Ref))
-  p5Ref.current.background(200)
-  console.log('model loaded')
+  debugger
+  ml5Ref.current.generate(seedPath, gotStrokePath)
 }
 
 function gotStrokePath(error, strokePath) {
   currentStroke = strokePath
 }
 
-export const draw = (p5Ref) => {
-  console.log(p5Ref)
+export const draw = (p5Ref, ml5Ref) => {
   p5Ref.current.stroke(0)
   p5Ref.current.strokeWeight(4)
 
@@ -104,8 +76,8 @@ export const draw = (p5Ref) => {
 
   if (currentStroke) {
     if (nextPen === 'end') {
-      sketchRNN.reset()
-      sketchRNNStart(p5Ref)
+      ml5Ref.current.reset()
+      sketchRNNStart(p5Ref, ml5Ref)
       currentStroke = null
       nextPen = 'down'
       return
@@ -118,6 +90,6 @@ export const draw = (p5Ref) => {
     y += currentStroke.dy
     nextPen = currentStroke.pen
     currentStroke = null
-    sketchRNN.generate(gotStrokePath)
+    ml5Ref.current.generate(gotStrokePath)
   }
 }
