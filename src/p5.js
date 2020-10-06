@@ -80,13 +80,15 @@ const App = () => {
   return (
     <div className="App">
       <h1>Draw Me Something Beautiful</h1>
-      <Select drawModel={drawModel} setDrawModel={setDrawModel} />
-      <Button onClick={handleStop} color="primary" variant="contained">
-        Stop Drawing
-      </Button>
-      <Button onClick={() => p5Ref.current.clear()} color="primary" variant="contained">
-        Reset
-      </Button>
+      <div>
+        <Select drawModel={drawModel} setDrawModel={setDrawModel} />
+        <Button onClick={handleStop} color="primary" variant="contained">
+          Stop Drawing
+        </Button>
+        <Button onClick={() => p5Ref.current.clear()} color="primary" variant="contained">
+          Reset
+        </Button>
+      </div>
       {modelLoading ? (
         <h1>loading...</h1>
       ) : (
